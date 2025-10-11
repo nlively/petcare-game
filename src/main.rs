@@ -1,35 +1,35 @@
-use raylib::prelude::{RaylibDraw, RaylibDrawHandle};
+// use raylib::prelude::{RaylibDraw, RaylibDrawHandle};
 use std::thread;
 use std::time::{Instant, Duration};
+
+use crate::types::Percent;
 
 mod game;
 mod dog;
 mod types;
-
+mod player;
 
 const TICKS_PER_SEC: i32 = 60;
 
 
 fn main() {
-
-
-    let &mut scottie = dog::Dog {
-        name: "Scottie",
-        breed: dog::Cockapoo,
-        gender: types::Boy,
-        date_of_birth: chrono::NaiveDate::from_ymd_opt(2023, 11, 14),
-        food_level: 100.0,
-        water_level: 100.0,
-        bladder_comfort: 100.0,
-        digestion_comfort: 100.0,
-        social_battery: 100.0,
-        energy_level: 100.0,
-        health_level: 100.0,
+    let mut scottie = dog::Dog {
+        name: "Scottie".to_string(),
+        breed: dog::DogBreed::Cockapoo,
+        gender: types::Gender::Boy,
+        date_of_birth: chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap(),
+        food_level: Percent::new(100.0),
+        water_level: Percent::new(100.0),
+        bladder_comfort: Percent::new(100.0),
+        digestion_comfort: Percent::new(100.0),
+        social_battery: Percent::new(100.0),
+        energy_level: Percent::new(100.0),
+        health_level: Percent::new(100.0),
     };
 
-    let &mut player = player::Player {
-        name: "noah",
-        gender: types::Boy,
+    let mut player = player::Player {
+        name: "noah".to_string(),
+        gender: types::Gender::Boy,
     };
 
     // Setup game data struct
@@ -48,7 +48,7 @@ fn main() {
         .build();
 
     // Setup game timer
-    let step = Duration::from_secs_f64(1.0 / TICKS_PER_SEC);
+    let step = Duration::from_secs_f64(1.0 / TICKS_PER_SEC as f64);
     let mut next_tick = Instant::now();
     let mut accumulator = Duration::ZERO;
     let mut prev = Instant::now();

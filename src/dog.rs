@@ -1,4 +1,6 @@
 
+use crate::types::{Food, Gender, Percent};
+
 pub enum DogBreed {
     Pitbull,
     GermanShepherd,
@@ -42,12 +44,12 @@ pub struct Dog {
 }
 
 impl Dog {
-    pub fn new(g: &Game, name: String, breed: DogBreed, gender: Gender) -> Self {
+    pub fn new(name: String, breed: DogBreed, gender: Gender, date_of_birth: chrono::NaiveDate) -> Self {
         Self {
             name: name,
             breed: breed,
             gender: gender,
-            date_of_birth: g.date(),
+            date_of_birth: date_of_birth,
             food_level: Percent::new(50.0),
             water_level: Percent::new(50.0),
             bladder_comfort: Percent::new(50.0),

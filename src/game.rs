@@ -1,5 +1,7 @@
 use raylib::prelude::{RaylibDraw, RaylibDrawHandle};
 use raylib::color::Color;
+use crate::dog::Dog;
+use crate::player::Player;
 
 const START_DATE: chrono::NaiveDate = chrono::NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
 const GAME_TIME_PASSING_SPEED: f64 = 10.0; // one day in game time per 10 minutes of real world time
@@ -8,12 +10,12 @@ const GAME_TIME_PASSING_SPEED: f64 = 10.0; // one day in game time per 10 minute
 pub struct Game {
     ticks_per_sec: i32,
     pub ticks: i32,
-    pub dog: dog::Dog,
-    pub player: player::Player,
+    pub dog: Dog,
+    pub player: Player,
 }
 
 impl Game {
-    pub fn new(ticks_per_sec: i32, dog: dog::Dog, player: player::Player) -> Self {
+    pub fn new(ticks_per_sec: i32, dog: crate::dog::Dog, player: Player) -> Self {
         Self {
             ticks_per_sec: ticks_per_sec,
             ticks: 0,

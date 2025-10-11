@@ -31,12 +31,8 @@ pub enum Gender {
 }
 
 
-pub struct Player {
-    name: String,
-    gender: Gender,
-}
 
 pub struct Food {
-    name: String,
-    nutritional_value: f64,
+    pub name: String,
+    pub nutritional_value: f64,
 }
