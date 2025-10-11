@@ -2,8 +2,6 @@
 use std::thread;
 use std::time::{Instant, Duration};
 
-use crate::types::Percent;
-
 mod game;
 mod dog;
 mod types;
@@ -13,33 +11,11 @@ const TICKS_PER_SEC: i32 = 60;
 
 
 fn main() {
-    let mut scottie = dog::Dog {
-        name: "Scottie".to_string(),
-        breed: dog::DogBreed::Cockapoo,
-        gender: types::Gender::Boy,
-        date_of_birth: chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap(),
-        food_level: Percent::new(100.0),
-        water_level: Percent::new(100.0),
-        bladder_comfort: Percent::new(100.0),
-        digestion_comfort: Percent::new(100.0),
-        social_battery: Percent::new(100.0),
-        energy_level: Percent::new(100.0),
-        health_level: Percent::new(100.0),
-    };
-
-    let mut player = player::Player {
-        name: "noah".to_string(),
-        gender: types::Gender::Boy,
-    };
+    let scottie = dog::Dog::new("Scottie".to_string(), dog::DogBreed::Cockapoo, types::Gender::Boy, chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap());
+    let player = player::Player::new("noah".to_string(), types::Gender::Boy);
 
     // Setup game data struct
-    let mut game = game::Game::new(TICKS_PER_SEC, scottie, player);
-
-    // let kibble = Food{ name: "Kibble", nutritional_value: 3};
-    // let rainbow_bone = Food { name: "Rainbow Bone", nutritional_value: 1};
-    // let beef_scraps = Food { name: "Beef Scraps", nutritional_value: 5 };
-
-    // game.dog.feed(kibble);
+    let mut game = game::Game::new(TICKS_PER_SEC);
 
     // Setup game window
     let (mut rl, thread) = raylib::init()
@@ -52,6 +28,8 @@ fn main() {
     let mut next_tick = Instant::now();
     let mut accumulator = Duration::ZERO;
     let mut prev = Instant::now();
+
+    game.show_splash();
 
     while !rl.window_should_close() {
 
@@ -79,7 +57,7 @@ fn main() {
         let now2 = Instant::now();
         if next_tick > now2 {
             // sleep most of the remaining time
-            let mut remain = next_tick - now2;
+            let remain = next_tick - now2;
             if remain > Duration::from_micros(500) {
                 thread::sleep(remain - Duration::from_micros(300)); // leave small buffer
             }
