@@ -1,6 +1,6 @@
 // use raylib::prelude::{RaylibDraw, RaylibDrawHandle};
-use std::thread;
 use std::time::{Instant, Duration};
+use std::thread;
 
 mod game;
 mod dog;
@@ -31,6 +31,10 @@ fn main() {
 
     game.show_splash();
 
+    // these are just temp
+    game.set_dog(scottie);
+    game.set_player(player);
+
     while !rl.window_should_close() {
 
         let now = Instant::now();
@@ -44,8 +48,12 @@ fn main() {
 
         // fixed updates
         while accumulator >= step {
-            game.update();
+            game.update(&rl);
             accumulator -= step;
+        }
+
+        if game.is_quit() {
+            break;
         }
 
         // render (optionally add interpolation alter)
