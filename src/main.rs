@@ -14,14 +14,14 @@ fn main() {
     let scottie = dog::Dog::new("Scottie".to_string(), dog::DogBreed::Cockapoo, types::Gender::Boy, chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap());
     let player = player::Player::new("noah".to_string(), types::Gender::Boy);
 
-    // Setup game data struct
-    let mut game = game::Game::new(TICKS_PER_SEC);
-
     // Setup game window
     let (mut rl, thread) = raylib::init()
         .size(800, 600)
         .title("All My Doggies")
         .build();
+
+    // Setup game data struct
+    let mut game = game::Game::new(TICKS_PER_SEC, &mut rl, &thread);
 
     // Setup game timer
     let step = Duration::from_secs_f64(1.0 / TICKS_PER_SEC as f64);
@@ -56,8 +56,7 @@ fn main() {
             break;
         }
 
-        // render (optionally add interpolation alter)
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = rl.begin_drawing(&thread); // or however you begin your frame
         game.draw(&mut d);
 
         // pace to next tick boundary (optional but nice)

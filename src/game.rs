@@ -1,4 +1,4 @@
-use raylib::prelude::{RaylibDraw, RaylibDrawHandle, RaylibHandle, KeyboardKey};
+use raylib::prelude::{RaylibDraw, RaylibDrawHandle, RaylibHandle, RaylibThread, KeyboardKey, Texture2D, Rectangle, Vector2};
 use raylib::color::Color;
 use crate::dog::Dog;
 use crate::player::Player;
@@ -31,19 +31,32 @@ impl SplashData {
 pub struct Game {
     ticks_per_sec: i32,
     state: GameState,
+    background: Texture2D,
+    // thread: RaylibThread,
     pub ticks: i32,
     pub dog: Option<Dog>,
     pub player: Option<Player>,
+    screen_w: f32,
+    screen_h: f32,
 }
 
 impl Game {
-    pub fn new(ticks_per_sec: i32) -> Self {
+    pub fn new(ticks_per_sec: i32, rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
+        let background = rl.load_texture(thread, "images/forest_trees/8/2304x1296.png")
+            .expect("failed to load background texture");
+
+        let screen_w = rl.get_screen_width() as f32;
+        let screen_h = rl.get_screen_height() as f32;
+
         Self {
             ticks_per_sec: ticks_per_sec,
             ticks: 0,
+            background: background,
             state: GameState::Initializing,
             dog: None,
-            player: None
+            player: None,
+            screen_w: screen_w,
+            screen_h: screen_h,
         }
     }
 
@@ -133,13 +146,13 @@ impl Game {
             GameState::CollectingInfo => {
             },
             GameState::MainMenu => {
-                self.update_main_menu(rl);
+                self.update_main_menu(&rl);
             },
             GameState::Playing => {
-                self.update_playing(rl);
+                self.update_playing(&rl);
             },
             GameState::Paused => {
-                self.update_paused(rl);
+                self.update_paused(&rl);
             },
             GameState::Quit => {
                 // do nothing. main.rs will take it from here.
@@ -147,8 +160,36 @@ impl Game {
         }
     }
 
+    fn draw_background(&self, d: &mut RaylibDrawHandle) {
+        // texture original size
+        let tex_w = self.background.width as f32;
+        let tex_h = self.background.height as f32;
+
+        // "cover" scaling while preserving aspect ratio (fills screen, may crop)
+        let scale = f32::max(self.screen_w / tex_w, self.screen_h / tex_h);
+        let dest_w = tex_w * scale;
+        let dest_h = tex_h * scale;
+        let dest_x = (self.screen_w - dest_w) * 0.5;
+        let dest_y = (self.screen_h - dest_h) * 0.5;
+
+        let src_rect = Rectangle::new(0.0, 0.0, tex_w, tex_h);
+        let dest_rect = Rectangle::new(dest_x, dest_y, dest_w, dest_h);
+
+        d.draw_texture_pro(
+            &self.background,
+            src_rect,
+            dest_rect,
+            Vector2::new(0.0, 0.0),
+            0.0,
+            Color::WHITE,
+        );
+    }
+
     pub fn draw(&self, d: &mut RaylibDrawHandle) {
+        
         d.clear_background(Color::BLACK);
+        self.draw_background(d);
+
         d.draw_text("All my doggies", 12, 12, 20, Color::PINK);
 
         let status: &str;
