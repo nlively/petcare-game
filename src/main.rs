@@ -2,6 +2,7 @@
 use std::time::{Instant, Duration};
 use std::thread;
 
+mod animation;
 mod game;
 mod dog;
 mod types;
