@@ -105,7 +105,7 @@ impl Dog {
             },
         }
 
-        Self {
+        let mut dog = Self {
             name: name,
             breed: breed,
             gender: gender,
@@ -136,7 +136,11 @@ impl Dog {
             water_drain_rate: DrainRate::new(Percent::new(20.0), ONE_HOUR), // 20% water consumption per hour
 
             last_drain_applied: Instant::now(),
-        }
+        };
+
+        dog.init_sprite_player();
+
+        return dog;
     }
 
     pub fn feed(&mut self, food: &Food) {
@@ -170,7 +174,7 @@ impl Dog {
     pub fn init_sprite_player(&mut self) {
         let key = AnimationKey { pose: self.pose, emotion: self.emotion, facing: self.facing };
         if let Some(descriptor) = self.animations.get(&key) {
-            // clone desc into palyer (desc contains the texture2D so adjust as needed)
+            // clone desc into player (desc contains the texture2D so adjust as needed)
             self.sprite_player = Some(AnimationPlayer::new(descriptor.clone()));
         }
     }
@@ -221,21 +225,27 @@ impl Dog {
         }
 
         if let Some(player) = &mut self.sprite_player {
+            println!("updating animation with dt value {}", dt);
             player.update(dt);
         }
     }
 
     // draw the dog using the player's current frame
     pub fn draw(&self, d: &mut RaylibDrawHandle) {
-        if let Some(player) = &self.sprite_player {
-            let src = player.current_frame_rect();
+        if let Some(animation_player) = &self.sprite_player {
+            let src = animation_player.current_frame_rect();
             // destination rect (example: keep source size, place at position)
-            let dest_rect = Rectangle::new(self.position.x, self.position.y, src.width, src.height);
+
+            println!("Dimensions. {},{} - {}x{}", self.position.x, self.position.y, src.width, src.height);
+
+            let x = self.position.x;
+            let y = self.position.y;
+            let dest_rect = Rectangle::new(x, y, src.width, src.height);
             // origin for rotation/scale - top-left here ;adjust to center if desired
             let origin = Vector2::new(0.0, 0.0);
 
             d.draw_texture_pro(
-                &player.texture(),
+                &animation_player.texture(),
                 src,
                 dest_rect,
                 origin,

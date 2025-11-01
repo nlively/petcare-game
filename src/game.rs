@@ -1,5 +1,6 @@
 use raylib::prelude::{RaylibDraw, RaylibDrawHandle, RaylibHandle, RaylibThread, KeyboardKey, Texture2D, Rectangle, Vector2};
 use raylib::color::Color;
+use crate::TICKS_PER_SEC;
 use crate::dog::Dog;
 use crate::player::Player;
 use crate::types::{Food,Percent};
@@ -24,7 +25,7 @@ struct SplashData {
 }
 
 impl SplashData {
-    fn new() -> Self { Self { start: Instant::now(), duration: Duration::from_secs(5) } }
+    fn new() -> Self { Self { start: Instant::now(), duration: Duration::from_secs(1) } }
     fn done(&self) -> bool { self.start.elapsed() >= self.duration }
 }
 
@@ -108,6 +109,8 @@ impl Game {
                 Some(dog) =>  {
                     let food = Food::new("kibble".to_string(), Percent::new(15.0));
                     dog.feed(&food);
+
+                    dog.update(1.0 / TICKS_PER_SEC as f32);
                 },
                 None => {}
             }
@@ -211,6 +214,8 @@ impl Game {
                     Some(dog) => {
                         let text = format!("food level {}", dog.food_level.as_f64());
                         d.draw_text(&text, 12, 150, 12, Color::YELLOW);
+
+                        dog.draw(d);
                     },
                     None => {}
                 }
