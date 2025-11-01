@@ -29,7 +29,6 @@ impl SplashData {
 }
 
 pub struct Game {
-    ticks_per_sec: i32,
     state: GameState,
     background: Texture2D,
     // thread: RaylibThread,
@@ -41,7 +40,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(ticks_per_sec: i32, rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
+    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
         let background = rl.load_texture(thread, "images/forest_trees/8/2304x1296.png")
             .expect("failed to load background texture");
 
@@ -49,7 +48,6 @@ impl Game {
         let screen_h = rl.get_screen_height() as f32;
 
         Self {
-            ticks_per_sec: ticks_per_sec,
             ticks: 0,
             background: background,
             state: GameState::Initializing,

@@ -1,5 +1,7 @@
 use raylib::prelude::{Texture2D, Rectangle};
+use raylib::{RaylibHandle, RaylibThread};
 use std::sync::Arc;
+use std::collections::HashMap;
 
 /// High-level facing for sprites.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
@@ -84,5 +86,61 @@ impl AnimationPlayer {
 
     pub fn texture(&self) -> &Texture2D {
         &self.descriptor.texture
+    }
+}
+
+
+#[derive(Hash, Eq, PartialEq, Debug)]
+pub struct AnimationKey {
+    pub pose: Pose,
+    pub emotion: Emotion,
+    pub facing: Facing,
+}
+
+pub struct AnimationBank {
+    pub map: HashMap<AnimationKey, AnimationDescriptor>,
+}
+
+impl AnimationBank {
+    pub fn new() -> Self { Self { map: HashMap::new() } }
+
+    pub fn get(&self, key: &AnimationKey) -> Option<&AnimationDescriptor> {
+        return self.map.get(key)
+    }
+
+    pub fn insert_strip(
+        &mut self,
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        key: AnimationKey,
+        path: &str,
+        frames: usize,
+        frame_duration_secs: f32,
+        looped: bool,
+    ) -> anyhow::Result<()> {
+        let tex = rl.load_texture(thread, path)?;
+        let tex = Arc::new(tex);
+
+        let frame_w = (tex.width / frames as i32) as f32;
+        let frame_h = tex.height as f32;
+
+        let mut rects = Vec::with_capacity(frames);
+        for i in 0..frames {
+            rects.push(Rectangle {
+                x: (i as f32) * frame_w,
+                y: 0.0,
+                width: frame_w,
+                height: frame_h,
+            });
+        }
+
+        self.map.insert(key, AnimationDescriptor { 
+            texture: tex, 
+            frames: rects, 
+            frame_duration_secs, 
+            looped,
+        });
+
+        Ok(())
     }
 }

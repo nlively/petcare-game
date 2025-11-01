@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 "chrono" = "0.4"
 "raylib" = "5.5"
+"anyhow" = "1.0"

@@ -1,9 +1,9 @@
 
 use crate::types::{Food, Gender, Percent, DrainRate};
-use crate::animation::{Facing, Pose, Emotion, AnimationDescriptor, AnimationPlayer};
+use crate::animation::{Facing, Pose, Emotion, AnimationPlayer, AnimationKey, AnimationBank};
 use std::time::{Instant, Duration};
-use std::collections::HashMap;
 use raylib::prelude::{RaylibDraw, RaylibDrawHandle, Rectangle, Vector2};
+use raylib::{RaylibHandle, RaylibThread};
 
 
 pub enum DogBreed {
@@ -33,12 +33,6 @@ pub enum DogBreed {
     Dalmatian,
 }
 
-#[derive(Hash, Eq, PartialEq, Debug)]
-pub struct AnimationKey {
-    pub pose: Pose,
-    pub emotion: Emotion,
-    pub facing: Facing,
-}
 
 pub struct Dog {
     pub name: String,
@@ -54,7 +48,7 @@ pub struct Dog {
     pub emotion: Emotion,
 
     // shared animation descriptors live in a map filled at load time
-    pub animations: HashMap<AnimationKey, AnimationDescriptor>,
+    pub animations: AnimationBank,
 
     // the per-dog player that uses the current animation descripttor
     pub sprite_player: Option<AnimationPlayer>,
@@ -75,11 +69,41 @@ pub struct Dog {
 const ONE_HOUR: Duration = Duration::from_secs(3600);
 
 impl Dog {
-    pub fn new(name: String, breed: DogBreed, gender: Gender, date_of_birth: chrono::NaiveDate) -> Self {
-        let animations: HashMap<AnimationKey, AnimationDescriptor>;
+    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread, name: String, breed: DogBreed, gender: Gender, date_of_birth: chrono::NaiveDate) -> Self {
+        let mut animations = AnimationBank::new();
 
-        // todo: fix this
-        animations = HashMap::new();
+        match breed {
+            DogBreed::Dalmatian => {
+                let _ = animations.insert_strip(
+                    rl, thread,
+                    AnimationKey { pose: Pose::Standing, emotion: Emotion::Neutral, facing: Facing::Right },
+                    "images/pixeldoggies/AttackDog.png", 16, 0.10, true);
+
+                let _ = animations.insert_strip(
+                    rl, thread,
+                    AnimationKey { pose: Pose::Standing, emotion: Emotion::Neutral, facing: Facing::Right },
+                    "images/pixeldoggies/BarkDog.png", 12, 0.10, true);
+
+                let _ = animations.insert_strip(
+                    rl, thread,
+                    AnimationKey { pose: Pose::Standing, emotion: Emotion::Neutral, facing: Facing::Right },
+                    "images/pixeldoggies/IdleDog.png", 7, 0.10, true);
+
+                let _ = animations.insert_strip(
+                    rl, thread,
+                    AnimationKey { pose: Pose::Standing, emotion: Emotion::Neutral, facing: Facing::Right },
+                    "images/pixeldoggies/LieDown.png", 12, 0.10, true);
+
+                let _ = animations.insert_strip(
+                    rl, thread,
+                    AnimationKey { pose: Pose::Walking, emotion: Emotion::Neutral, facing: Facing::Right },
+                    "images/pixeldoggies/RunDog.png", 5, 0.10, true);
+
+            },
+            _ => {
+                // panic... unsupported breed
+            },
+        }
 
         Self {
             name: name,

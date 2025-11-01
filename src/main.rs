@@ -12,17 +12,17 @@ const TICKS_PER_SEC: i32 = 60;
 
 
 fn main() {
-    let scottie = dog::Dog::new("Scottie".to_string(), dog::DogBreed::Cockapoo, types::Gender::Boy, chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap());
-    let player = player::Player::new("noah".to_string(), types::Gender::Boy);
-
     // Setup game window
     let (mut rl, thread) = raylib::init()
         .size(800, 600)
         .title("All My Doggies")
         .build();
 
+    let scottie = dog::Dog::new(&mut rl, &thread, "Scottie".to_string(), dog::DogBreed::Dalmatian, types::Gender::Boy, chrono::NaiveDate::from_ymd_opt(2023, 11, 14).unwrap());
+    let player = player::Player::new("noah".to_string(), types::Gender::Boy);
+
     // Setup game data struct
-    let mut game = game::Game::new(TICKS_PER_SEC, &mut rl, &thread);
+    let mut game = game::Game::new(&mut rl, &thread);
 
     // Setup game timer
     let step = Duration::from_secs_f64(1.0 / TICKS_PER_SEC as f64);
